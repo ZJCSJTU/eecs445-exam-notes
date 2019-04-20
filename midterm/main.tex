@@ -1,0 +1,228 @@
+\documentclass[10pt, letterpaper]{article}
+%Some packages I commonly use.
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{framed}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{enumerate}
+\usepackage{float}
+\usepackage[utf8]{inputenc}
+\usepackage[top=0.25 in,bottom=0.25 in, left=0.25 in, right=0.25 in]{geometry}
+\usepackage{listings}
+\usepackage{color}
+
+\usepackage{multicol}
+\setlength{\columnsep}{0.1in}
+
+
+\begin{document}
+% \linespread{2.0}
+\begin{multicols*}{2}
+\noindent 
+\textbf{Training data}: $S_{n}=\left\{\overline{x}^{(i)}, y^{(i)}\right\}_{i=1}^{n}$\\
+\textbf{Training error}: $E_{n}(\overline{\theta})=\frac{1}{n} \sum_{i=1}^{n} [[ y^{(i)} \neq h\left(\overline{{x}}^{(i)} ; \theta\right)]]=\frac{1}{n} \sum_{i=1}^{n} [[ y^{(i)} \cdot h\left(\overline{{x}}^{(i)} ; \theta\right) \le 0]]$.\\
+\textbf{Perceptron Algorithm}:\\
+On input $S_{n}=\left\{\overline{x}^{(i)}, y^{(i)}\right\}_{i=1}^{n}$\\
+Initialize $k=0, ~\overline{\boldsymbol{\theta}}^{(\mathbf{0})}=\overline{\boldsymbol{0}},~b^{(0)} = 0$\\
+\textbf{while} there exists a misclassified point\\
+\hspace*{2ex} \textbf{for} $i=1\cdots n$\\
+\hspace*{4ex} \textbf{if} $y^{(i)} \neq h\left(\overline{x}^{(i)} ; \overline{\theta}^{(k)}\right)$\\
+\hspace*{6ex}  $\overline{\theta}^{(k+1)}=\overline{\theta}^{(k)}+y^{(i)} \overline{x}^{(i)}$\\
+\hspace*{6ex} $b^{(k+1)} = b^{(k)} + y^{(i)}$\\
+\hspace*{6ex} $k++$\\
+If data are linearly separable, perceptron converges.\\
+\textbf{Empirical Risk}: $R_{n}(\overline{\theta})=\frac{1}{n} \sum_{i=1}^{n} \operatorname{Loss}\left(h\left(\overline{x}^{(i)} ; \overline{\theta}\right), y^{(i)}\right)$\\
+1. 0-1: $\operatorname{Loss}_{0-1}\left(h\left(\overline{x}^{(i)} ; \overline{\theta}\right), y^{(i)}\right) =[[ y^{(i)}\left(\overline{\theta} \cdot \overline{x}^{(i)}\right) \leq 0 ]]$\\
+2. Hinge: $\operatorname{Loss}_{h}(z)=\max \{1-z, 0\}$\\
+Convex function: $\lambda \in [0,1], \forall x, x^{\prime}~ f\left(\lambda x+(1-\lambda) x^{\prime}\right) \leq \lambda f(x)+(1-\lambda) f\left(x^{\prime}\right)$\\
+Gradient: $\nabla_{\overline{\theta}} R_{n}(\overline{\theta})=\left[\frac{\partial R_{n}(\overline{\theta})}{\partial \theta_{1}}, \dots, \frac{\partial R_{n}(\overline{\theta})}{\partial \theta_{d}}\right]^{\mathrm{T}}$\\
+\textbf{GD}: $\overline{\theta}^{(k+1)}=\overline{\theta}^{(k)}-\eta \nabla_{\overline{\theta}} R_{n}\left.(\overline{\theta})\right|_{\overline{\theta}=\overline{\theta}^{k}}$\\
+\textbf{SGD}: look at one mis-classified example each time\\
+Initialize $k=0, ~\overline{\boldsymbol{\theta}}^{(\mathbf{0})}=\overline{\boldsymbol{0}}$\\
+\textbf{while} convergence criteria is not met\\
+\hspace*{2ex} randomly shuffle points\\
+\hspace*{2ex} \textbf{for} $i=1\cdots n$\\
+\hspace*{4ex} \textbf{if} $y^{(i)}\left(\overline{\theta} \cdot \overline{x}^{(i)}\right)<1$\\
+\hspace*{6ex}  $\overline{\theta}^{(k+1)}=\overline{\theta}^{(k)}-\eta \nabla_{\overline{\theta}} \operatorname{Loss}_{h}\left.\left(y^{(i)}\left(\overline{\theta} \cdot \overline{x}^{(i)}\right)\right)\right|_{\overline{\theta}=\overline{\theta}^{k}}=\theta^{(k)}+\eta y^{(i)} \overline{x}^{(i)}$\\
+\hspace*{6ex} $k++$\\
+\textbf{Logistic loss}: $\operatorname{Loss}_{\log }(z)=\log _{2}(1+\exp (-z))$\\
+$\nabla_{\overline{\theta}} \operatorname{Loss}_{\text{log}}\left(y^{(i)}\left(\overline{\theta} \cdot \overline{x}^{(i)}\right)\right) = \frac 1 {\ln 2} \cdot \frac{-y^{(i)}\bar x^{(i)}}{1+\exp(y^{(i)}(\bar\theta \cdot \bar x ^{(i)}))}$\\
+\textbf{Regression}: $y \in \mathbb{R}$, regression function $f : \mathbb{R}^{d} \rightarrow \mathbb{R} $, where $ f \in \mathcal{F}$\\
+Empirical risk for linear reg: $R_{n}(\overline{\theta})=\frac{1}{n} \sum_{i=1}^{n} \operatorname{Loss}\left(y^{(i)}-\left(\overline{\theta} \cdot \overline{x}^{(i)}\right)\right)$\\
+Least square loss function: $R_{n}(\overline{\theta})=\frac{1}{n} \sum_{i=1}^{n} \frac{\left(y^{(i)}-\left(\overline{\theta} \cdot \overline{x}^{(i)}\right)\right)^{2}}{2}$\\
+$\nabla_{\overline{\theta}} R_{n}(\overline{\theta})= \frac 1 n\sum_{i=1}^n(y^{(i)} - \bar\theta \cdot \bar x ^{(i)})\cdot(-\bar x^{(i)})$\\
+SGD for linear regression: $\overline{\theta}^{(k+1)}=\overline{\theta}^{(k)}+\eta_{k}\left(y^{(i)}-\overline{\theta}^{(k)} \cdot \overline{x}^{(i)}\right) \overline{x}^{(i)}$\\
+Find closed-form: $\nabla_{\overline{\theta}} R_{n}\left.(\overline{\theta})\right|_{\overline{\theta}=\overline{\theta}^{*}}= 0 = -\frac{1}{n} \sum_{i=1}^{n} \overline{x}^{(i)} y^{(i)}+\frac{1}{n} \sum_{i=1}^{n} \overline{x}^{(i)}\left(\overline{x}^{(i)}\right)^{T}\bar\theta^*=:-\bar b + A\bar \theta^*$\\
+Define $X=\left[\overline{x}^{(1)}, \ldots, \overline{x}^{(n)}\right]^{T}$, $\overline{y}=\left[y^{(1)}, \ldots, y^{(n)}\right]^{T}$\\
+$\bar b = \frac 1 n X^T\bar y$, $A = \frac{1}{n} X^{T} X$. Hence $\boxed{\bar\theta^* = \left(X^{T} X\right)^{-1} X^{T} \overline{y}}$\\
+\textbf{Regularization}: $J_{n, \lambda}(\overline{\theta})=\lambda Z(\overline{\theta})+R_{n}(\overline{\theta})$\\
+Ridge regression: $\boxed{J_{n, \lambda}(\overline{\theta})=\lambda \frac{\|\overline{\theta}\|^{2}}{2}+\frac{1}{n} \sum_{i=1}^{n} \frac{\left(y^{(i)}-\left(\overline{\theta} \cdot \overline{x}^{(i)}\right)\right)^{2}}{2}}$\\
+By setting the gradient 0, $\boxed{\overline{\theta}^{*}=\left(\lambda I+X^{T} X\right)^{-1} X^{T} Y}$\\
+\textbf{SVM} maximum margin separator. $\gamma^{(i)}(\bar \theta,b) = \frac {(\bar\theta\cdot\bar x ^{(i)} + b)y^{(i)}}{||\bar\theta||}$ 
+$\max_{\bar\theta,b}\min_i \gamma^{(i)}(\bar \theta,b)\Rightarrow \max_{\bar\theta} \frac 1 {||\bar\theta||}$ s.t. $y^{(i)}\left(\overline{\theta} \cdot \overline{x}^{(i)}+b\right) \ge 1,~\forall i$\\
+\textbf{Lagrange Multipliers}: \\
+$\min _{\overline{\theta}}  f(\overline{x} ; \overline{\theta})$ subject to $h_{i}(\overline{x} ; \overline{\theta}) \leq 0, \forall i=1, \ldots, n$ is equivalent to
+\vspace{-2.5ex}
+\[{\min _{\overline{\theta}} \max _{\overline{\alpha}} \quad f(\overline{x} ; \overline{\theta})+\sum_{i=1}^{n} \alpha_{i} h_{i}(\overline{x} ; \overline{\theta})\text{ s.t. }\alpha_{i} \geq 0, \forall i=1, \dots, n}\]
+For $h_i < 0$, $\alpha_i = 0$, for $h_i=0$, $\alpha_i>0$, for $h_i>0$, $\alpha_i=\infty$.\\
+\textbf{SVM Primal Formulation}\\
+$
+\begin{array}{ll}{\min _{\overline{\theta}}} & {\frac{1}{2}\|\overline{\theta}\|^{2}} \\ {\text { subject to }} & {y^{(i)}\left(\overline{\theta} \cdot \overline{x}^{(i)}\right) \geq 1, \forall i=1, \ldots, n}\end{array}
+$\\
+After applying Lagrange multiplier,
+\vspace{-2ex}
+\begin{equation*} 
+\boxed{
+\begin{array}{ll}{\min _{\overline{\theta}} \max _{\overline{\alpha}}} & {\frac{1}{2}\|\overline{\theta}\|^{2}+\sum_{i=1}^{n} \alpha_{i}\left(1-y^{(i)}\left(\overline{\theta} \cdot \overline{x}^{(i)}\right)\right)} \\ {\text { subject to }} & {\alpha_{i} \geq 0, \forall i=1, \ldots, n}\end{array}
+}
+\end{equation*}
+Dual Formulation
+\vspace{-2ex}
+\begin{equation*} 
+\boxed{
+\begin{array}{ll}{\max _{\overline{\alpha}} \min _{\overline{\theta}}} & {\frac{1}{2}\|\overline{\theta}\|^{2}+\sum_{i=1}^{n} \alpha_{i}\left(1-y^{(i)}\left(\overline{\theta} \cdot \overline{x}^{(i)}\right)\right)} \\ {\text { subject to }} & {\alpha_{i} \geq 0, \forall i=1, \ldots, n}\end{array}
+}
+\end{equation*}
+Set the gradient w.r.t. $\bar\theta$ to be zero, get $\overline{\theta}^{*}=\sum_{i=1}^{n} \alpha_{i} y^{(i)} \overline{x}^{(i)}$
+\vspace{-2ex}
+\[\boxed{\max _{\overline{\alpha}, \alpha_{i} \geq 0} \sum_{i=1}^{n} \alpha_{i}-\frac{1}{2} \sum_{i=1}^{n} \sum_{j=1}^{n} \alpha_{i} \alpha_{j} y^{(i)} y^{(j)} \overline{x}^{(i)} \cdot \overline{x}^{(j)}}\]
+$\begin{array}{ll}{y^{(i)} \overline{\theta}^{*} \cdot \overline{x}^{(i)}=1,} & {\text { if } \alpha_{i}>0}\text{ is support vector} \\
+{y^{(i)} \overline{\theta}^{*} \cdot \overline{\overline{x}}^{(i)}>1,} & {\text { if } \alpha_{i}=0}\text{ not support vector} \end{array}$\\
+\textbf{Feature mapping} $\bar x \in \mathbb R^d\Rightarrow \phi(\bar x) \in \mathbb R^p$\\
+\textbf{Soft Margin SVMs} for non-linearly separable data\\
+$\boxed{\begin{array}{ll}{\min _{\bar\theta, \xi}} & {\frac{1}{2}\|\bar\theta\|^{2}+C \sum_{i=1}^{n} \xi_{i}} \\ {\text { subject to }} & {y^{(i)}(\overline{\theta} \cdot \overline{x}+b) \geq 1-\xi_{i}, ~\xi_{i} \geq 0,~ \forall i=1, \ldots, n}\end{array}}$\\
+Its Lagrangian
+\vspace{-2ex}
+\begin{align*}
+    &L(\overline{\theta}, \overline{\alpha}, b, \overline{\gamma}, \overline{\xi})=\\
+    &\frac{1}{2}\|\overline{\theta}\|^{2}+C \sum_{i=1}^{n} \xi_{i}+\sum_{i=1}^{n} \alpha_{i}\left(1-\xi_{i}-y^{(i)}\left(\overline{\theta} \cdot \overline{x}^{(i)}+b\right)\right)-\sum_{i=1}^{n} \gamma_{i} \xi_{i}
+\end{align*}
+The final equation is the same as hard margin.\\
+\textbf{Kernel} has an associated feature mapping
+\vspace{-2ex}
+\[K\left(\overline{x}^{(i)}, \overline{x}^{(j)}\right)=\phi\left(\overline{x}^{(i)}\right) \cdot \phi\left(\overline{x}^{(j)}\right)\]
+\textbf{Kernalized Dual SVM}\\
+$\max _{\overline{\alpha}} \sum_{i=1}^{n} \alpha_{i}-\frac{1}{2} \sum_{i=1}^{n} \sum_{j=1}^{n} \alpha_{i} \alpha_{j} y^{(i)} y^{(j)}K\left(\overline{x}^{(i)}, \overline{x}^{(j)}\right)$, subject to $\alpha_{i} \geq 0 \quad \forall i=1, . ., n$\\
+Classify new example: $h\left(\overline{x}^{(j)}\right)=\operatorname{sign}(\sum_{i=1}^{n} \alpha_{i} y^{(i)}{\underbrace{\overline{x}^{(i)} \cdot \overline{x}^{(j)}}_{K(\overline{x}^{(i)}, \overline{x}^{(j)})}})$\\
+\textbf{Kernel Algebra}: 1. $K(\overline{x}, \overline{z})=K_{1}(\overline{x}, \overline{z})+K_{2}(\overline{x}, \overline{z})$; 2.  $K(\overline{x}, \overline{z})=\alpha K_{1}(\overline{x}, \overline{z})~(\alpha > 0)$; 3. $K(\overline{x}, \overline{z})=K_{1}(\overline{x}, \overline{z}) K_{2}(\overline{x}, \overline{z})$\\
+\textbf{Feature Selection}\\
+\\
+\textbf{Shannon Entropy and Information Gain}
+\vspace{-2ex}
+\[H(X)=-\sum_{i=1}^k \Pr\left(X=x_{i}\right) \log _{2} \Pr\left(X=x_{i}\right)\]
+\vspace{-2ex}
+\[H(Y|X=x_i)=-\sum_{j=1}^k \Pr\left(Y=y_j|X=x_{i}\right) \log _{2} \Pr\left(Y=y_j|X=x_{i}\right)\]
+\vspace{-2ex}
+\[H(Y|X) = \sum_{i=1}^m\Pr(X=x_i)\cdot H(Y|X=x_i)\]
+\vspace{-2ex}
+\[IG(X, Y) = H(Y) - H(Y|X)\]
+\textbf{Build Tree} by selecting the best spilt each time
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=10.2cm]{BuildTree.png}
+\end{figure}
+\noindent\textbf{Bootstrap Sampling}: Pick $n$ samples uniformly at random from the original training dataset. About $1-(1-1/n)^n\rightarrow63\%$ are selected.\\
+Note that Bagging reduces variance (estimation error), but bias (structural error) may still remain. Also, independence of classifiers is a strong assumption.\\
+To further decorrelate the decision trees learnt, use \textbf{Random Forests:} 1. bagging. 2. random feature subset.\\
+\textbf{for} $b=1,\dots,B$\\
+\hspace*{2ex} draw bootstrap sample $S_n(b)$ of size $n$ from $S_n$\\
+\hspace*{2ex} [grow decision tree $DT^{(b)}$]\\
+output ensemble $\{DT^{(1)},\dots,DT^{(B)}\}$\\
+\textbf{subprocedure} for growing $DT^{(b)}$:
+until stopping criteria are met, recursively repeat following steps
+for each node of tree:\\
+1. select $k$ features at random from $d$ features\\
+2. pick best feature to split on (using $IG$)\\
+3. split node into children.\\
+\textbf{Boosting}: General strategy for combining weak classifiers into a strong classifer\\
+\textbf{AdaBoost}\\
+In each round, make sure $\sum_{i=1}^{n} \widetilde{w}_{m}(i)=1$\\
+\textbf{set} $\widetilde{W}_{0}(i)=\frac{1}{n}$ for $i=1 \ldots n$\\
+\textbf{for} $m=1$ to $M$ do:\\
+\hspace*{2ex}find $h\left(\overline{x} ; \overline{\theta}^{*(m)}\right)$, a weak clf that approximately minimizes the \hspace*{2ex}weighted training error $\epsilon_m$:\\
+\hspace*{4ex}$\boxed{\epsilon_{m}=\sum_{i=1}^{n} \widetilde{W}_{m-1}(i)\left[\left[y^{(i)} \neq h\left(\overline{x}^{(i)} ; \overline{\theta}^{(m)}\right)\right]\right]}$\\
+\hspace*{2ex}given $\overline{\theta}^{*(m)}$, compute $\hat{\epsilon}_{m}$ and $\alpha_m$ that minimizes wrighted training \hspace*{2ex}loss:
+\hspace*{4ex}$\boxed{\hat{\alpha}_{m}=\frac{1}{2} \ln \left(\frac{1-\hat{\epsilon}_{m}}{\hat{\epsilon}_{m}}\right)}$\\
+\hspace*{2ex}update weights on all training examples:\\
+\hspace*{2ex}\textbf{for} $i=1$ to $n$ do:
+\vspace*{-2ex}
+\[\boxed{\widetilde{W}_{m}(i)=\overbrace{\widetilde{W}_{m-1}(i) \exp \left\{-y^{(i)} \hat{\alpha}_{m} h\left(\overline{x}^{(i)} ; \overline{\theta}_{m}^{*}\right)\right\}}^{\exp\left(-y^{(i)}h_m(\overline{x}^{(i)})\right)}/\underbrace{Z_m}_{\text{normalize}}}\]
+\hspace*{2ex}\textbf{end for}\\
+\textbf{end for}\\
+output final classifier $h_M(\overline{x})=\sum_{m=1}^{M} \hat{\alpha}_{m} h\left(\overline{x} ; \overline{\theta}^{*(m)}\right)$\\
+\textbf{Decision stumps} (DT with depth 1) as weak clf:\\
+$h(\overline{x} ; \overline{\theta})=\operatorname{sign}\left(\theta_{1}\left(x_{k}-\theta_{0}\right)\right)$, where $\overline{\theta}=(\overbrace{k}^{\text{coordinate}}, \overbrace{\theta_{0}}^{\text{position}}, \overbrace{\theta_{1}}^{\text{direction}})$
+\vspace{-2ex}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=7cm]{adaboost.png}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+\noindent\textbf{Neural Network}\\
+\emph{SGD-single layer}\\
+(0)Initialize parameters to small random values\\
+(1)Select a point at random\\
+(2)Update the parameters based on that point and the gradient:\\
+$\overline{\theta}^{(k+1)}=\overline{\theta}^{(k)}-\eta_{k} \nabla_{\overline{\theta}} \operatorname{Loss}\left(y^{(i)} h\left(\overline{x}^{(i)} ; \overline{\theta}\right)\right)$ where $z=h(\bar x^{(i)};\bar\theta)$\\
+$\frac{\partial Loss(yz)}{\partial w_i}=\frac{\partial Loss(yz)}{\partial z}\frac{\partial z}{\partial w_j}$\\
+assume $Loss=max(1,1-yz)$, then $\frac{\partial Loss(yz)}{\partial w_i}=-yx_j$
+\\Finally, $w_{j}^{(k+1)}=w_{j}^{(k)}+\eta_{k} x_{j} y$
+\begin{figure}[H]
+    \includegraphics[width=6cm]{new_nn.png}
+\end{figure}
+\noindent$w_{ki}^{(j)}$ is the weight of layer j, unit k, input i\\
+$z_i(k)=\sum_{n = 1}^{d}w_{in}x_n$\\
+$h_i^{k} = g(z_i^{(k)})$\\
+\emph{Activation Function}\\
+1. rectified linear $f(z)=max(0,z)$\\
+2. threshold $f(z)=sign(z)$\\
+3. sigmoid $f(x)=\frac{1}{1+e^{-x}}$\\
+4. tanh $f(z)=tanh(z)$\\
+\emph{two-layer}\\
+use back-propagation(GD+chain rule)\\
+$v_{j}^{(k+1)}=v_{j}^{(k)}+\eta_{k} y h_{j}[[(1-y z)>0]]$\\
+$\frac{\partial \operatorname{Loss}(y z)}{\partial w_{j i}}=\frac{\partial \operatorname{Los} s(y z)}{\partial z} \frac{\partial z}{\partial h_{j}} \frac{\partial h_{j}}{\partial z_{j}} \frac{\partial z_{j}}{\partial w_{j i}}$\\
+$w_{j i}^{(k+1)}=w_{j i}^{(k)}+\eta_{k} y[[(1-y z)>0]] v_{j}\left[\left[z_{j}>0\right]\right] x_{i}$\\
+\noindent\textbf{backprop}\\
+1. For each training instance, make a prediction $h(\bar x^{i},\bar\theta)$\\
+2. Measure the $Loss(y^{(n)}h(\bar x^{(n)}, \bar\theta))$\\
+3. go through each layer in reverse to measure the error contribution of each connection(bkwd propagate)\\
+4. tweak weight to reduce error(SGD update)
+
+
+\noindent \textbf{Some Math}\\
+\textbf{Gradient}: consider $f, g : \mathbb{R}^{n} \rightarrow \mathbb{R}$ and $k \in \mathbb{R}$\\
+1. $\nabla k f=k \nabla f$\\
+2. $\nabla(f \pm g)=\nabla f \pm \nabla g$\\
+3. Product Rule: $\nabla(f g)=f \nabla g+(\nabla f) g$\\
+4. If $A$ is symmetric and $q(\vec{x})=\vec{x}^{T} A \vec{x}$, then $\nabla q(\vec{x})=2 A \vec{x}$.\\
+5. Hessian: $\left[\nabla^{2} f\right]_{i j}=\frac{\partial^{2} f}{\partial x_{i} \partial x_{j}}$\\
+6. Gradient of L2-norm: $\nabla_{\overline{\theta}}\|\overline{\theta}\|^{2}=2 \overline{\theta}$\\
+\textbf{Chain Rule}: consider a function $g : \mathbb{R}^{n} \rightarrow \mathbb{R}$ and $f : \mathbb{R} \rightarrow \mathbb{R}$, then $\nabla f \circ g(\vec{x})=f^{\prime}(g(\vec{x})) \nabla g(\vec{x})$\\
+\textbf{Eigenvalues/vecotrs}: 1. Solve $\operatorname{det}(A-\lambda I)=0$ for $\lambda$. 2. For each $\lambda,$ solve $(A-\lambda I) \vec{v}=\vec{0}$ for $\vec{v}$\\
+\textbf{Positive (semi-)definite}\\
+1. A symmetric matrix $A \in \mathbb{R}^{n \times n}$ is said to be positive definite if $\forall \overline{z} \in \mathbb{R}^{n}-\{\overline{0}\}, \overline{z}^{T} A \overline{z}>0$\\
+2. A symmetric matrix $A \in \mathbb{R}^{n \times n}$ is said to be positive semi-definite if $\forall \overline{z} \in \mathbb{R}^{n}, \overline{z}^{T} A \overline{z} \geq 0$\\
+For a positive (semi-)definite matrix, all its eigenvalues are positive (non-negative).
+
+
+
+
+
+
+\end{multicols*}
+\end{document}
+ 
