@@ -1,0 +1,174 @@
+\documentclass[10pt, letterpaper]{article}
+%Some packages I commonly use.
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{framed}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{enumerate}
+\usepackage{float}
+\usepackage[utf8]{inputenc}
+\usepackage[top=0.25 in,bottom=0.25 in, left=0.25 in, right=0.25 in]{geometry}
+\usepackage{listings}
+\usepackage{color}
+
+\usepackage{multicol}
+\setlength{\columnsep}{0.1in}
+
+
+\begin{document}
+% \linespread{2.0}
+\begin{multicols*}{2}
+\noindent
+\textbf{Clustering}\\
+Input: $S_{n}=\left\{\overline{x}^{(i)}\right\}_{i=1}^{n} \overline{x} \in \mathbb{R}^{d}$\\
+Output: a set of cluster assignments $c_1,\dots,c_n$, where $c_{i} \in\{1, \ldots, k\}$\\
+\textbf{K-means}\\
+Datapoints $\overline{x}^{(1)}, \ldots, \overline{x}^{(n)}$ and fixed $k$. Initial means $\overline{\mu}^{(1)}, \ldots, \overline{\mu}^{(k)}$\\
+Iteratively, \\
+1. reassign $\overline{x}^{(i)}$ to $c_{i}=\arg \min _{j}\left\|\overline{x}^{(i)}-\overline{\mu}^{(j)}\right\|^{2}$\\
+2. recompute $\overline{\mu}^{(j)}=\frac{\sum_{i}[[c_{i}=j]] \overline{x}^{(i)}}{\sum_{i}[[c_{i}=j]]}$\\
+That is, define $J(\overline{c}, \overline{\mu})=\sum_{i=1}^{n}\left\|\overline{x}^{(i)}-\overline{\mu}^{\left(c_{i}\right)}\right\|^{2}$\\
+First, fix $\overline \mu$, choose $\overline c$ to minimize $J$. Second, fix $\overline c$, choose $\overline \mu$ to minimize $J$.\\
+k-means performs coordinate descent
+on the objective function. k-means is guaranteed to converge (because objective function is monotonically decreasing), but not necessarily the global minimum. Solution: vary initialization of k-means, and pick clustering with lowest (eventual) objective function value (for a fixed k).\\
+\textbf{Spectral Clustering}\\
+Weight matrix: $W$, where $w_{ij}$ represents the similarity between $v_i$ and $v_j$.\\
+Degree of a vertex: $d_{i}=\sum_{j=1}^{n} w_{i j}$\\
+Degree matrix $D$: $D_{i i}=\sum_{j=1}^{n} w_{i j}$, $D_{i j}=0$ for $i \neq j$\\
+Cost of a cut between $A$ and $\overline A$: $\operatorname{cut}(A, \overline{A})=\sum_{i \in A} \sum_{j \in \overline{A}} w_{i j}$\\
+Graph Laplacian: $L = D - W$.\\
+Build matrix with the first $k$ eigenvectors
+(corresponding to the $k$ smallest eigenvalues)
+as columns interpret rows as new data points\\
+Apply $k$-means to new data representation\\
+\textbf{Hierarchical Clustering}\\
+1. Assign each pt. its own cluster, for each point $i$, $C_i = \{\overline x^{(i)}\}$\\
+2. Find the closest clusters \& merge, repeat until convergence
+\[\arg \min _{i, j} d\left(C_{i}, C_{j}\right) \text { where } i \neq j\]
+\textbf{Recommender Systems}\\
+Approach \#1: \textbf{Nearest Neighbor Prediction}\\
+User: $a$, $b$.$Y_{ai}$ is missing, i.e., $a$ has not rated movie $i$.\\
+Define $R(a,b)$: set of movies rated by both users $a$ and $b$\\
+$\tilde{Y}_{a : b}=\frac{1}{|R(a, b)|} \sum_{j \in R(a, b)} Y_{a_{j}}$
+\[\operatorname{sim}(a, b)=\frac{\sum_{j \in R(a, b)}\left(Y_{a_{j}}-\tilde{Y}_{a : b}\right)\left(Y_{b_{j}}-\tilde{Y}_{b : a}\right)}{\sqrt{\sum_{j \in R(a, b)}\left(Y_{a_{j}}-\tilde{Y}_{a : b}\right)^{2} \sum_{j \in R(a, b)}\left(Y_{b_{j}}-\tilde{Y}_{b : a}\right)^{2}}}\]
+Define $KNN(a,i)$: $k$ nearest neighbors, i.e., the $k$ most similar users to a, who have rated movie.
+\[\hat{Y}_{a_{i}}=\overline{Y}_{a}+\frac{1}{\sum_{b \in k N N(a, i)}|\operatorname{sim}(a, b)|} \sum_{b \in k N N(a, i)} \operatorname{sim}(a, b)\left(Y_{b_{i}}-\overline{Y}_{b}\right)\]
+Approach \#2: \textbf{Matrix Factorization}\\
+Let $A\in \mathbb R^{n\times m}$, and $rank(A) = r$. Then there exists $X\in \mathbb R^{n\times r}$, $Y\in \mathbb R^{r\times m}$, such that $A = XY$\\
+Given $Y$ with empty cells, construct low rank-$d$ $\widehat{Y}$ with no empty cells. We may think of $Y$ as being approximated by $\widehat{Y} = UV^T$, where $U\in \mathbb R^{n\times d}$ contains the relevant features of the user, and
+$V\in \mathbb{R}^{m\times d}$ contains the relevant features of the movie.
+\[J(U,V) = \frac 12 \sum_{(a,i)\in D}(Y_{ai} - [UV^T]_{ai})^2 + \frac{\lambda}2 \sum_{a = 1}^n\sum_{k=1}^dU_{ak}^2 + \frac{\lambda}2 \sum_{i = 1}^m\sum_{k=1}^dV_{ik}^2\]
+$U = [\overline{u}^{(1)},\dots, \overline{u}^{(n)}]^T$, and $V^T = [\overline{v}^{(1)},\dots, \overline{v}^{(m)}]$\\
+Algorithm Overview (coordinate descent)\\
+1. Initialize $V$ to small (random) values.\\
+2. Iterate until convergence\\
+Fix $\overline{v}^{(1)},\dots,\overline{v}^{(m)}$. Solve for $\overline{u}^{(1)},\dots,\overline{u}^{(n)}$
+\[\min_{\overline{u}^{(a)}}\frac 12 \sum_{i\in D_a} (Y_{ai} - \overline{u}^{(a)}\cdot \overline{v}^{(i)})^2 + \frac{\lambda}{2} \|\overline{u}^{(a)}\|^2\]
+Fix $\overline{u}^{(1)},\dots,\overline{u}^{(n)}$. Solve for $\overline{v}^{(1)},\dots,\overline{v}^{(m)}$
+\[\min_{\overline{v}^{(i)}}\frac 12 \sum_{a\in D_i} (Y_{ai} - \overline{u}^{(a)}\cdot \overline{v}^{(i)})^2 + \frac{\lambda}{2} \|\overline{v}^{(i)}\|^2\]
+\textbf{i.i.d assumption}\\
+Identically drawn from $\mathcal{D}$, each trial independent from each other.\\
+\textbf{Gaussian Distribution}
+\[\mathcal{N}\left(x | \mu, \sigma^{2}\right)=\frac{1}{\sqrt{2 \pi \sigma^{2}}} e^{-\frac{1}{2 \sigma^{2}}(x-\mu)^{2}}\]
+\textbf{Spherical Gaussian}
+\[\mathcal{N}\left(\overline{x} | \overline{\mu}, \sigma^{2}\right)=\frac{1}{(2\pi\sigma^2)^{d/2}}\exp\left(-\frac{1}{2\sigma^2}\|\overline x - \overline \mu\|^2\right) \]
+\textbf{MLE results}\\
+\[\overline \mu = \frac 1 n \sum_{i = 1}^n \overline{x}^{(i)}, ~\sigma^2 = \frac1{nd}\sum_{i = 1}^n \|\overline{x}^{(i)} - \overline \mu\|^2\]
+\textbf{GMM, EM}\\
+Iterate until convergence:\\
+E step: use current estimate of mixture model to
+assign examples to clusters\\
+M step: re-estimate each cluster model separately
+based on the points assigned to it (similar to the
+``known cluster'' case)\\
+Bayes' Theorem:
+\[P(A|B)=\frac{P(B|A)P(A)}{P(B)} = \frac{P(B|A)P(A)}{\sum_{A} P(B|A)P(A)}\]
+E-step: fix parameters $\overline{\theta} = [\gamma_1,\dots,\gamma_k, \overline{\mu}^{(1)}, \dots, \overline{\mu}^{(k)},\sigma_1^2,\dots,\sigma_k^2]$, compute posterior distribution
+\[P(j|i) = \frac{\gamma_i\cdot\mathcal{N}(\overline{x}^{(i)}|\overline{\mu}^{(j)}, \sigma_j^2)}{\sum_{t = 1}^k \gamma_t\cdot\mathcal{N}(\overline{x}^{(i)}|\overline{\mu}^{(t)}, \sigma_t^2)}\]
+M-step: fix posterior distribution $P(j|i)$, compute MLE parameters $\overline{\theta}$.
+\[n_j = \sum_{j=1}^n P(j|i),\quad\gamma_j = \frac{n_j}{n}\]
+\[\overline \mu^{(j)} = \frac 1 {n_j} \sum_{i = 1}^n P(j|i) \overline{x}^{(i)},\quad\sigma_j^2 = \frac1{n_j d}\sum_{i = 1}^n P(j|i) \|\overline{x}^{(i)} - \overline \mu\|^2\]
+\textbf{EM in general}\\
+Observed data $x$, latent variable $z$ (e.g., cluster labels)\\
+$l(\overline{\theta};x) = \sum_{i=1}^n\log \sum_{z^{(i)}} \operatorname{P}(\overline{x}^{(i)},z^{(i)};\overline{\theta})$\\
+E-step: compute expectations to ``fill in'' missing values according to current estimate of $\overline{\theta}$, compute $\operatorname{P}(z^{(i)}=k|\overline{x}^{(i)};\overline{\theta})$\\
+M-step: re-estimate parameters with ``weighted'' values.\\
+\[\overline{\theta}^{t + 1} = \arg\max_{\overline{\theta}} \sum_{i}\sum_{k} \operatorname{P}(z^{(i)}=k|\overline{x}^{(i)};\overline{\theta}^{(t)})\log \operatorname{P}(z^{(i)} = k, \overline{x}^{(i)}; \overline{\theta}^{(t)})\]
+\textbf{Bayesian Networks}\\
+For a given graph, the joint distribution can be written as a product of the conditional probability of each variable given its parents
+\[P\left(X_{1}, \ldots, X_{d}\right)=\prod_{i=1}^{d} P\left(X_{i} | X_{p a_{i}}\right)\]
+\textbf{Three Rules}\\
+1. $P(X,Y)=P(X|Y)P(Y)$\\
+2. $P(X) = \sum_YP(X,Y)$\\
+3. $\sum_XP(X|Y) = 1$\\
+\textbf{d-separation}\\
+Step 1: keep only ancestral graph of the variables of interest\\
+Step 2: (``moralize'') add undirected edge between any two variables in ancestral graph that have a common child \& change to undirected.\\
+Step 3: (i) if there is \textbf{no} path between variables of interest, they are marginally independent.\\
+(ii) if \textbf{all} paths go through a particular node, then the variables are independent given that node.\\
+\textbf{MLE learning on Bayesian Networks}\\
+log-likelihood: $l(\theta; S_n, G) = \sum_{t= 1}^n\sum_{i = 1}^d \log \theta_i(x_{i}^{(t)}|x_{pai}^{(t)})$\\
+Corresponding MLE:
+\vspace*{-1em}
+\[\hat{\theta}_i(x_i|x_{pai}) = \frac{\#(X_i=x_i, X_{pai}=x_{pai})}{\sum_{x_i'}\#(X_i=x_i', X_{pai}=x_{pai})}\]
+Bayesian Information Criterion, $n$ is number of training data
+\vspace*{-1em}
+\[\operatorname{BIC}(D;\overline{\theta}) = l(D; \overline{\theta}) - \frac{\#\operatorname{param}}{2}\log(n)\]
+\textbf{$M^{\text{th}}$ order Markov Model}\\
+Assumption: the $t^{\text{th}}$ observation is independent of previous observations given the $(t – 1)^{\text{st}}$ ,...,$(t – M)^{\text{th}}$ observations\\
+Joint pdf: $P(x_1, \dots, x_T) = \dots \Pi_{t = M + 1}^T P(x_t|x_{t-1},\dots,x_{t-M})$\\
+Number of parameters: $O(k^{M+1})$\\
+\textbf{Hidden Markov Model (HMM)}\\
+Assumption: the hidden variable ($z$'s) are discrete random variables ($x$'s are observed).
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=5cm]{HMM.png}
+\end{figure}
+\noindent Transition Probabilities: $A\left(h_{i}, h_{j}\right)=P\left(z_{t+1}=h_{j} | z_{t}=h_{i}\right)$\\
+Emission Probabilities: $B\left(h_{i}, o_{l}\right)=P\left(x_{t}=o_{l} | z_{t}=h_{i}\right)$\\
+Starting State Probability: $\pi\left(h_{i}\right)=P\left(z_{1}=h_{i}\right)$\\
+Joint probability distribution: $P\left(x_{1}, \ldots, x_{T}, z_{1}, \ldots, z_{T}\right)=\pi\left(z_{1}\right) \prod_{t=1}^{T-1} A\left(z_{t}, z_{t+1}\right) \prod_{t=1}^{T} B\left(z_{t}, x_{t}\right)$\\
+\textbf{Viterbi Algorithm (Dynamic Programming)}\\
+Input: the observations $x_1,\dots,x_T$, and model parameterss $\theta = \{\Pi, A, B\}$\\
+Output: Infer the underlaying $z_1,\dots,z_T$, namely,
+\[\underset{z_{1}, \ldots, z_{T}}{\operatorname{argmax}} P\left(x_{1}, \ldots, x_{T}, z_{1}, \ldots, z_{T} ; \theta\right)\]
+If we define $A(z_0,z_1) = \Pi(z_1)$, then one can define
+\[P\left(x_{1}, \ldots, x_{T}, z_{1}, \ldots, z_{T} ; \theta\right)=\prod_{t=1}^T \left(A(z_{t-1})B(z_t,x_t)\right)\]
+Define $r(z_1,\dots, z_k) = \prod_{t=1}^k \left(A(z_{t-1})B(z_t,x_t)\right)$, $1\le k\le T$.\\
+Define $s(k,v)$ to be set of all sequences
+of length $k$ that end in $z_k=v$.\\
+Define $\psi(k,v) = \max_{s(k,v)} r(z_1,\dots, z_k)$.\\
+Base case: $\psi(1,v) = \Pi(v)B(v,x_1)$.\\
+Recursive steps:
+\[\psi(k,v) = \max_{u\in H} \left\{\psi(k-1,u)A(u,v)B(v,x_k)\right\}\]
+Time complexity: $O(M^2T)$.\\
+Backtrack: $\hat{z_T} = \arg\max_{v\in H}\psi(v,T)$.\\
+$\hat{z_{T-1}} = \arg\max_{u\in H}\left\{\psi(T-1, u) A(u, \hat{z_T})\right\}$\\
+$\hat{z_{T-2}} = \arg\max_{u\in H}\left\{\psi(T-2, u) A(u, \hat{z_{T-1}})\right\}$ $\dots$\\
+\textbf{Parameter Estimation}\\
+MLE: $\Pi(v)=\frac{\#(z=v)}{\sum_{v'\in H} \#(z=v')}$, $A(z,z')=\frac{\#(z\rightarrow z')}{\sum_{v\in H} \#(z\rightarrow v)}$,\\
+$B(z,x) = \frac{\#(z\rightarrow x)}{\sum_{x'\in O} \#(z\rightarrow x')}$.\\
+\textbf{Stuffs before Midterm}\\
+\textbf{Lagrange Multipliers}: \\
+$\min _{\overline{\theta}}  f(\overline{x} ; \overline{\theta})$ subject to $h_{i}(\overline{x} ; \overline{\theta}) \leq 0, \forall i=1, \ldots, n$ is equivalent to
+\vspace{-2.5ex}
+\[{\min _{\overline{\theta}} \max _{\overline{\alpha}} \quad f(\overline{x} ; \overline{\theta})+\sum_{i=1}^{n} \alpha_{i} h_{i}(\overline{x} ; \overline{\theta})\text{ s.t. }\alpha_{i} \geq 0, \forall i=1, \dots, n}\]
+For $h_i < 0$, $\alpha_i = 0$, for $h_i=0$, $\alpha_i>0$, for $h_i>0$, $\alpha_i=\infty$.\\
+\textbf{Shannon Entropy and Information Gain}
+\vspace{-2ex}
+\[H(X)=-\sum_{i=1}^k \Pr\left(X=x_{i}\right) \log _{2} \Pr\left(X=x_{i}\right)\]
+\vspace{-2ex}
+\[H(Y|X=x_i)=-\sum_{j=1}^k \Pr\left(Y=y_j|X=x_{i}\right) \log _{2} \Pr\left(Y=y_j|X=x_{i}\right)\]
+\vspace{-2ex}
+\[H(Y|X) = \sum_{i=1}^m\Pr(X=x_i)\cdot H(Y|X=x_i)\]
+\vspace{-2ex}
+\[IG(X, Y) = H(Y) - H(Y|X)\]
+
+
+
+\end{multicols*}
+\end{document}
